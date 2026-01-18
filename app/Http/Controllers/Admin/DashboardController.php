@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Mahasiswa;
 use App\Models\Jurusan;
+use App\Models\MataKuliah;
 
 class DashboardController extends Controller
 {
@@ -12,20 +13,21 @@ class DashboardController extends Controller
     {
         $totalMahasiswa = Mahasiswa::count();
         $totalJurusan = Jurusan::count();
+        $totalMataKuliah = MataKuliah::count();
 
-        $mahasiswaStatus = [
-            'aktif' => Mahasiswa::where('status', 'aktif')->count(),
-            'cuti' => Mahasiswa::where('status', 'cuti')->count(),
-            'nonaktif' => Mahasiswa::where('status', 'nonaktif')->count(),
-        ];
+        $mahasiswaAktif = Mahasiswa::where('status', 'aktif')->count();
 
-        $mahasiswa = Mahasiswa::latest()->paginate(10);
+        $mahasiswaTerbaru = Mahasiswa::with('jurusan')
+            ->latest()
+            ->take(10)
+            ->get();
 
         return view('admin.index', compact(
             'totalMahasiswa',
             'totalJurusan',
-            'mahasiswaStatus',
-            'mahasiswa'
+            'totalMataKuliah',
+            'mahasiswaAktif',
+            'mahasiswaTerbaru'
         ));
     }
 }
